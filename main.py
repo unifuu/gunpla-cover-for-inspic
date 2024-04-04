@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageChops
 import cv2
 import numpy as np
 import datetime
@@ -46,9 +46,9 @@ def remove_v2(image_path):
 
 def show_image(img):
     scale_percent = 50
-    width = int(image.shape[1] * scale_percent / 100)
-    height = int(image.shape[0] * scale_percent / 100)
-    resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    resized_image = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
 
     cv2.imshow('Display image', resized_image)
     cv2.waitKey(0)
@@ -56,6 +56,55 @@ def show_image(img):
 
 def write_image(img):
     cv2.imwrite("final.png", img)
+
+def get_contours(img):
+    image = cv2.imread(img)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # _, thresh = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)
+
+    # thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # show_image(thresh)
+
+    return contours
+
+def trim(im):
+    bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
+    diff = ImageChops.difference(im, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff.getbbox()
+    if bbox:
+        return im.crop(bbox)
+
+im = Image.open("origin.png")
+im = trim(im)
+im.save('trim.png')
+
+
+# get_contours('test.png')
+
+# image = cv2.imread('test.png')
+# contours = get_contours('test.png')
+# # print(contours)
+
+# top_contour = min(contours, key=cv2.contourArea)
+# bottom_contour = max(contours, key=cv2.contourArea)
+
+# print(top_contour, bottom_contour)
+
+# # Get bounding boxes
+# x_top, y_top, w_top, h_top = cv2.boundingRect(top_contour)
+# x_bottom, y_bottom, w_bottom, h_bottom = cv2.boundingRect(bottom_contour)
+
+# # Crop the image to remove white borders
+# cropped_image = image[y_top:y_bottom+h_bottom, 0:image.shape[1]]
+
+# Display the cropped image
+# cv2.imshow('Cropped Image', cropped_image)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
 # Example usage:
 # remove_v1("test.png", 100)
@@ -112,35 +161,35 @@ def write_image(img):
 
 
 ################################ Test 4
-image = cv2.imread('origin.png')
+# image = cv2.imread('test.png')
 
-# Convert the image to grayscale
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# # Convert the image to grayscale
+# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-# Threshold the grayscale image to create a binary mask
-_, binary_mask = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+# # Threshold the grayscale image to create a binary mask
+# _, binary_mask = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
 
-# Find contours in the binary mask
-contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# # Find contours in the binary mask
+# contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# Filter contours to identify the ones corresponding to the white rectangles
-white_rectangles = []
-for contour in contours:
-    x, y, w, h = cv2.boundingRect(contour)
-    # Check if the contour is close to the image boundary
-    if x < 10 or y < 10 or x + w > image.shape[1] - 10 or y + h > image.shape[0] - 10:
-        white_rectangles.append((x, y, w, h))
+# # Filter contours to identify the ones corresponding to the white rectangles
+# white_rectangles = []
+# for contour in contours:
+#     x, y, w, h = cv2.boundingRect(contour)
+#     # Check if the contour is close to the image boundary
+#     if x < 10 or y < 10 or x + w > image.shape[1] - 10 or y + h > image.shape[0] - 10:
+#         white_rectangles.append((x, y, w, h))
 
-print(white_rectangles)
+# print(white_rectangles)
 
-# Draw bounding boxes around the detected white rectangles
-for rect in white_rectangles:
-    x, y, w, h = rect
-    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+# # Draw bounding boxes around the detected white rectangles
+# for rect in white_rectangles:
+#     x, y, w, h = rect
+#     cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-image2 = Image.open('origin.png')
-img = image2.crop((49, 49, 49, 49))
-img.save("final2.png")
+# # image2 = Image.open('origin.png')
+# # img = image2.crop((49, 49, 49, 49))
+# # img.save("final2.png")
 
 # show_image(image)
 # write_image(image)
