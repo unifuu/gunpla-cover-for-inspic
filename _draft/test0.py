@@ -1,7 +1,6 @@
 from PIL import Image, ImageChops
 import cv2
 import numpy as np
-import datetime
 
 def remove_v1(image_path, remove_height):
     # Open the image
@@ -84,14 +83,11 @@ im.save('trim.png')
 
 
 # get_contours('test.png')
-
 # image = cv2.imread('test.png')
 # contours = get_contours('test.png')
 # # print(contours)
-
 # top_contour = min(contours, key=cv2.contourArea)
 # bottom_contour = max(contours, key=cv2.contourArea)
-
 # print(top_contour, bottom_contour)
 
 # # Get bounding boxes
@@ -106,18 +102,17 @@ im.save('trim.png')
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
-# Example usage:
 # remove_v1("test.png", 100)
 # remove_v2("origin.png")
 
-################################ Test 1: Read a rectangle in the top
+################################ Read a rectangle in the top
 # img = cv2.imread('origin.png')
 # x, y, w, h = 0, 100, img.shape[1], img.shape[0] - 100  # Adjust the y-coordinate and height as needed
 # cropped_img = img[y:y+h, x:x+w]
 # cv2.imwrite('new_cut.png', cropped_img)
 
 
-############################# Test 2: Detect the white rectangle
+############################# Detect the white rectangle
 # image = cv2.imread('origin.png')
 # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # _, binary_mask = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
@@ -137,7 +132,7 @@ im.save('trim.png')
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
-######################################### Test 3
+#########################################
 # # Read the image
 # image = cv2.imread('origin.png')
 
@@ -160,7 +155,7 @@ im.save('trim.png')
 #         break  # Assuming there is only one white rectangle
 
 
-################################ Test 4
+################################
 # image = cv2.imread('test.png')
 
 # # Convert the image to grayscale
